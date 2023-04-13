@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>reg form</title>
+  </head>
+  <body>
+    <div class="important">
+      <h1 style="text-align: center">Registration Form</h1>
+      
+      <!--my form class-->
+      <form action=" " method="get" class="form_section">
+        <fieldset>
+          <legend><h3>Student name</h3></legend>
+          <div class="name">
+            <div class="heading-field">
+             
+            </div>
+            <div class="input_field">
+              <input
+                type="text"
+                class="form_section_input"
+                id="first_name"
+                name="fname"
+                required
+              />
+              <div>enter your first name</div>
+              <br />
+            </div>
+            <div class="input_field">
+              <input
+                type="text"
+                class="form_section_input"
+                id="last_name"
+                name="lname"
+                required
+              />
+              <div>enter your last name</div>
+            </div>
+        </fieldset>
+        <br>
+
+          <!-- personal information start  -->
+          <fieldset>
+            <legend> <h3>Personal information</h3></legend>
+            <div class="form-section">
+              <div class="heading-field">
+               
+              </div>
+              <div class="field-inputs">
+                <div class="input-div">
+                  <input type="radio" id="male" name="gender" value="male" />
+                  <label for="male">Male</label><br />
+                  <input type="radio" id="female" name="gender" value="female" />
+                  <label for="female">Female</label><br />
+                </div>
+              </div>
+            </div>
+          </fieldset>
+          <br>
+          <!--end-->
+         <fieldset>
+          <legend> <h3>Age information</h3></legend>
+          <div class="form-section">
+            <div class="heading-field">
+             
+            </div>
+            <div class="field-inputs">
+              <input
+                type="number"
+                class="form_section_input"
+                id="age"
+                name="age"
+                required
+              />
+              <div>enter your age</div>
+            </div>
+            <br>
+            
+            <div>
+              <div class="field-inputs">
+                <input type="date"/ class="form_section_input" id="age" name="Student age" required/>
+                <div>enter your birth day</div>
+              </div>
+            </div>
+            <br>
+          </div>
+         </fieldset>
+
+        <!--college info-->
+        <fieldset>
+          <legend> <h3>Institute</h3></legend>
+          <div class="form-section">
+            <div class="heading-field">
+             
+            </div>
+            <select name="university" required>
+              <option value=""> </option>
+              <option value="Jimma">Jimma</option>
+              <option value="Addis ababa">Addis ababa</option>
+              <option value="Gonder">Gonder</option>
+              <option value="Metu">Metu</option>
+              <option value="Bahirdar">Bahirdar</option>
+              <option value="Haremaya">Haremaya</option>
+              <option value="Diredawa">Diredawa</option>
+    
+              
+            </select>
+            <div>select your university from the list
+            </div>
+            <br>
+  
+            <div>
+              <div class="field-inputs">
+                <input type="text" class="form_section_input" id="camp" name="campus"required/>
+                <div>university campus</div>
+            </div>
+          </div>
+        </fieldset>
+        <!--grade report-->
+        <fieldset>
+          <legend> <h3>Grade Report</h3></legend>
+          <div class="form-section">
+            <div class="heading-field">
+             
+            </div>
+            <div class="field-inputs">
+              <input type="number" class="form_section_input" id="Grade" name="c_grade" required/>
+              <div>enter your comulative gpa</div>
+            </div>
+  
+          </div>
+        </fieldset>
+        <!--adress-->
+        <fieldset>
+          <legend> <h3>Address</h3></legend>
+          <div class="form-section">
+            <div class="heading-field">
+             
+            </div>
+            <div class="field-inputs">
+              <input type="text" class="form_section_input" id="country" name="country name" required/>
+              <div>enter your country</div>
+            </div>
+            <br>
+           <select name="region" required>
+            <option value=""> </option>
+            <option value="oromia">oromia</option>
+            <option value="south">south</option>
+            <option value="somalia">somalia</option>
+            <option value="afar">afar</option>
+            <option value="harari">harari</option>
+            <option value="amhara">amhara</option>
+            <option value="tigray">tigray</option>
+  
+            
+          </select>
+          <div>select  your region from the list
+          </div>
+              <br>
+             
+              <br>
+              <div class="field-inputs">
+                <input type="text" class="form_section_input" id="woreda" name="woreda" required/>
+                <div>woreda</div>
+              </div>
+              <br>
+              <div class="field-inputs">
+                <input type="text" class="form_section_input" id="kebele" name="kebele" required/>
+                <div>kebele</div>
+              </div>  
+              <br>
+             
+           
+          </div>
+        </fieldset>
+         <!--contact information-->
+        <fieldset>
+          <legend> <h3>contact information</h3> </legend>
+          <div class="form-section">
+            <div class="heading-field">
+             
+            </div>
+            <div class="field-inputs">
+              <input type="number" class="form_section_input" id="phone_number" name="phone" pattern="[0-9]{4} [0-9]{3} [0-9]{3}" title="please enter a number in this format: #### ### ###" required/>
+              <div>phone</div>
+            </div>
+  
+            <div class="field-inputs">
+              <input type="email" class="form_section_input" id="email" name="email Address" pattern="[a-zA-Z]{3,}@[a-zA-Z]{3,}[.]{1}[a-zA-Z]{2,}" title="please enter a valid email Address " required/>
+             
+             
+              <div>email</div>
+            </div>
+           </div>
+        </fieldset>
+         <br>
+         <button style="color: brown;" type="reset">Reset</button>
+         <br><br>
+         <button style="color: rgb(0, 255, 106);" type="submit">Submit</button>
+
+
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

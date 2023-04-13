@@ -1,0 +1,37 @@
+{
+  "name": "final_proj_01",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "dev": "nodemon app.js",
+    "compile:sass": "sass --watch views/pages/material-kit-master/assets/scss:views/pages/material-kit-master/assets/css"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.3.0",
+    "@tensorflow/tfjs": "^4.2.0",
+    "@tensorflow/tfjs-node": "^4.2.0",
+    "ajax": "^0.0.4",
+    "body-parser": "^1.20.2",
+    "bootstrap": "^5.2.3",
+    "canvas": "^2.11.0",
+    "cors": "^2.8.5",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-fileupload": "^1.4.0",
+    "face-api.js": "^0.22.2",
+    "font-awesome": "^4.7.0",
+    "fs": "^0.0.1-security",
+    "mongodb": "^5.2.0",
+    "mongoose": "^7.0.2",
+    "multer": "^1.4.4",
+    "path": "^0.12.7",
+    "pusher": "^5.1.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
