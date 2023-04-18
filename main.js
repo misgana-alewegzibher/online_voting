@@ -1,14 +1,14 @@
-const form = document.getElementById("vote-form");
+const formmm = document.getElementById("vote-formm");
 
 // form event listner  start
 
-form.addEventListener("submit", (e) => {
+formmm.addEventListener("submit", (e) => {
   const choice = document.querySelector("input[name=candidates]:checked").value;
 
   const data = { candidates: choice };
 
   fetch("http://localhost:3000/vote", {
-    method: "post",
+    method: "post", 
     body: JSON.stringify(data),
     headers: new Headers({
       "Content-Type": "application/json",
@@ -78,17 +78,7 @@ if (chartContainer) {
 
 });
 
-// form event listner end
+// form event listner en
 
 
-
-
-
-
-
-
-
-
-
-
-// form event listner end
+// form event listner en

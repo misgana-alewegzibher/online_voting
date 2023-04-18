@@ -11,6 +11,7 @@ const fileUpload = require("express-fileupload");
 const cors = require("cors");
 const Pusher = require("pusher");
 const fs = require('fs');
+const ejs = require("ejs");
 const multer = require('multer');
 const tf = require("@tensorflow/tfjs");
 const tfnode = require("@tensorflow/tfjs-node");
@@ -40,12 +41,16 @@ app.use(
   })
 );
 
+app.set("view engine", "ejs");
+
+
 const storage = multer.diskStorage({
 
   
   destination: (req, file, cb) => {
 
     const desname = req.body.full_name ;
+    
     const userUploadsDir = path.join(__dirname, 'uploads', desname);
     fs.mkdirSync(userUploadsDir, { recursive: true });
     if (file.fieldname === "File1") {
@@ -99,6 +104,48 @@ const imageUploadFunc = imageUpload.fields([
 ])
 
 
+const storage1 = multer.diskStorage({
+
+  
+  destination: (req, file, cb) => {
+
+    const desnamee = req.body.candname1 ;
+    const userUploadsDirr = path.join(__dirname, 'uploads', desnamee);
+    fs.mkdirSync(userUploadsDirr, { recursive: true });
+    if (file.fieldname === "candimg") {
+      cb(null, `uploads/${desnamee}/`);
+    } 
+
+  },
+  filename: (req, file, cb) => {
+
+    const originalExtension = file.originalname.split('.').pop();
+  
+    // Generate the new filename by adding "1" and the original extension
+
+ 
+    if (file.fieldname === "candimg") {
+      cb(null, "1." + originalExtension);
+      
+    }
+
+  },
+});
+
+const imageUpload1 = multer({
+  storage: storage1,
+
+});
+
+const imageUploadFunc1 = imageUpload1.fields([
+  {
+    name: "candimg",
+    maxCount: 1,
+  },
+
+])
+
+
 
 const pusher = new Pusher({
   appId: "1573664",
@@ -129,6 +176,17 @@ const nameschema = new mongoose.Schema({
   userImg1: String,
   userImg2: String,
   userImg3: String,
+  hasVoted: {
+    type: Boolean,
+    default: false
+  }
+ 
+});
+const candidatesschema = new mongoose.Schema({
+  full_name: String ,
+  email: String ,
+  description: String ,
+  candImg1: String,
  
 });
 
@@ -137,7 +195,7 @@ const VoteSchema = new mongoose.Schema({
   candidates: {
     type: String,
     required: true,
-  },
+  }, 
   points: {
     type: String,
     required: true,
@@ -147,29 +205,61 @@ const VoteSchema = new mongoose.Schema({
 const users = new mongoose.model("users", nameschema);
 const admins = new mongoose.model("admins", nameschema);
 const Vote = mongoose.model("Vote", VoteSchema);
+const candidates = mongoose.model("candidates", candidatesschema);
 
 
 
 
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/views/bootstrap/landing.html");
+  res.sendFile(__dirname + "/views/bootstrap/profile.html");
 });
-
-
+ 
+  
 
 
 app.get("/vote", (req, res) => {
-  Vote.find().then(votes => res.json({success:true , votes:votes}));
+
+
+  Vote.find().then(votes => {
+    console.log("Votes:", votes);
+    res.json({success:true , votes:votes});
+  }).catch(err => {
+    console.error(err);
+    res.status(500).send({message:err.message });
+  });
+  
+
+  
 });
 
 app.get("/profile", (req, res) => {
-  res.sendFile(__dirname + "/views/bootstrap/landing.html");
+
+  candidates.find().then(candid => {
+    console.log("Candidates:", candid);
+    res.render('voting' , {
+      candid: candid ,
+    })
+    
+  }).catch(err => {
+    console.error(err);
+    res.status(500).send({message:err.message });
+  });
 });
-
-
-
-
+     
+//  app.get("/", (req, res) => {
+//    candidates.find().exec((err,cands)=>{
+//      if(err) {
+//        res.json({message:err.message});
+//      }
+//      else {
+   
+//      } 
+//    })
+//  }); 
+    
+   
  app.post('/sign_up', imageUploadFunc, (req, res) => {
+  
 
   const img_1 = req.files.File1[0].path;
   const img_2 = req.files.File2[0].path;
@@ -390,5 +480,30 @@ new Vote(newVote).save().then(vote => {
 
 
 });
+app.post("/register", imageUploadFunc1 ,(req, res) => {
+
+
+  const imgg = req.files.candimg[0].path;
+
+  const newcandidate = new candidates({
+      
+    full_name: req.body.candname1,
+    email: req.body.candemail1,   
+    description: req.body.message1,
+ candImg1  : path.join(".." + "/" + imgg),
+  });
+
+  newcandidate.save() 
+    .then(() => {
+      console.log('Data saved successfully!');
+      res.sendFile(__dirname + '/views/bootstrap/admin.html');
+    })
+    .catch((err) => {
+      console.error('Error while saving data:', err);
+      res.status(500).send('Internal Server Error');
+   });
+
+  
+  });
 
 app.listen(process.env.PORT || 3000, () => console.log("running on port 3000"));
