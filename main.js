@@ -17,15 +17,17 @@ formmm.addEventListener("submit", (e) => {
     .then((res) => res.json())
     .then((data) => console.log(data))
     .catch((err) => console.log(err));
-  
+   
   e.preventDefault();
-});
+});                                             
 
 
 fetch("http://localhost:3000/vote").then(res => res.json()).then(data=>{
    
+console.log(data);
+
 const votes = data.votes;
-const totalVotes = votes.length;
+const totalVotes = votes.length; 
 
 const voteCounts = votes.reduce((acc,vote)=>(acc[vote.candidates]=(acc[vote.candidates] || 0  + parseInt(vote.points)) , acc), {});
 

@@ -876,41 +876,102 @@
       </div>
     </div>
   </div>
-  
-  <form action="/vote" method="post" id="vote-form">
+
+  <form action="/vote" method="post" id="vote-formm">
     <section class="pt-3 pb-4 mt-8" id="count-stats">
       <div class="container bg-gradient-dark mt-5">
         <div class="row">
-
-             
-          <% candid.forEach(function(candidate) { %>
-            <div class="col-md-4 position-relative ">
-              <div class="p-3 text-center">
-                <div class="col-12">
-                  <a href="" class="avatar avatar-lg rounded-circle" >
-                    <img alt="Image placeholder" src="<%= candidate.candImg1 %>">
-                  </a>
+          <% candid.forEach(function(candidate, index) { %>
+            <% if(index === 0) { %>
+              <div class="col-md-4 position-relative ">
+                <div class="p-3 text-center">
+                  <div class="col-12">
+                    <a href="" class="avatar avatar-lg rounded-circle" >
+                      <img alt="Image placeholder" src="<%= candidate.candImg1 %>">
+                    </a>
+                  </div>
+                  <h5 class="mt-3"><%= candidate.full_name %></h5>
+                  <p class="text-sm font-weight-normal">
+                    <%= candidate.description %>
+                  </p>
+            
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" value="candidate_1" id="candidate_3"
+                    name="candidates">
+                    <label class="form-check-label" for="candidate_1">
+                      SELECT
+                    </label>
+                  </div>
                 </div>
-                <h5 class="mt-3"><%= candidate.full_name %></h5>
-                <p class="text-sm font-weight-normal">
-                  <%= candidate.description %>
-                </p>
-          
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="candidates" id="<%= candidate._id %>"
-                  value="<%= candidate._id %>">
-                  <label class="form-check-label" for="<%= candidate._id %>">
-                    SELECT
-                  </label>
-                </div>
+                <hr class="vertical dark" />
               </div>
-              <hr class="vertical dark" />
-            </div>
+            <% } %>
+            <% if(index === 1) { %>
+              <div class="col-md-4 position-relative ">
+                <div class="p-3 text-center">
+                  <div class="col-12">
+                    <a href="" class="avatar avatar-lg rounded-circle" >
+                      <img alt="Image placeholder" src="<%= candidate.candImg1 %>">
+                    </a>
+                  </div>
+                  <h5 class="mt-3"><%= candidate.full_name %></h5>
+                  <p class="text-sm font-weight-normal">
+                    <%= candidate.description %>
+                  </p>
+            
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" value="candidate_2" id="candidate_2"
+                    name="candidates">
+                    <label class="form-check-label" for="candidate_2">
+                      SELECT
+                    </label>
+                  </div>
+                </div>
+                <hr class="vertical dark" />
+              </div>
+            <% } %>
+            <% if(index === 2) { %>
+              <div class="col-md-4 position-relative ">
+                <div class="p-3 text-center">
+                  <div class="col-12">
+                    <a href="" class="avatar avatar-lg rounded-circle" >
+                      <img alt="Image placeholder" src="<%= candidate.candImg1 %>">
+                    </a>
+                  </div>
+                  <h5 class="mt-3"><%= candidate.full_name %></h5>
+                  <p class="text-sm font-weight-normal">
+                    <%= candidate.description %>
+                  </p>
+            
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" value="candidate_3" id="candidate_3"
+                          name="candidates" >
+                    <label class="form-check-label" for="candidate_3">
+                      SELECT
+                    </label>
+                  </div>
+                </div>
+                <hr class="vertical dark" />
+              </div>
+              <div class="text-center m-3">
+                <button type="submit" class="btn btn-primary mb-0" value="Vote">VOTE</button>
+              </div>
+              
+
+            <% } %>
           <% }); %>
+          
         </div>
       </div>
+     
+    
     </section>
   </form>
+
+
+  <div id="chartContainer">  
+
+  </div>
   
  <!-- In your index.ejs file: -->
  <!-- <form action="/vote" method="post" id="vote-formm">
@@ -1015,9 +1076,6 @@
 </form> -->
 
 
-<div id="chartContainer">
-
-</div>
 </body>
 <script>
 

@@ -43,6 +43,7 @@ app.use(
 
 app.set("view engine", "ejs");
 
+let numCandidatesAdded = 0; 
 
 const storage = multer.diskStorage({
 
@@ -217,24 +218,16 @@ app.get("/", (req, res) => {
   
 
 
-app.get("/vote", (req, res) => {
 
 
-  Vote.find().then(votes => {
-    console.log("Votes:", votes);
-    res.json({success:true , votes:votes});
-  }).catch(err => {
-    console.error(err);
-    res.status(500).send({message:err.message });
-  });
-  
 
-  
-});
 
+ 
 app.get("/profile", (req, res) => {
+ 
 
   candidates.find().then(candid => {
+
     console.log("Candidates:", candid);
     res.render('voting' , {
       candid: candid ,
@@ -246,6 +239,20 @@ app.get("/profile", (req, res) => {
   });
 });
      
+
+
+
+app.get("/vote", (req, res) => {
+  Vote.find().then(votes => {
+    console.log("Votes:", votes);
+    res.json({success:true , votes:votes});
+  }).catch(err => {
+    console.error(err);
+    res.status(500).send({message:err.message });
+  });
+});
+
+
 //  app.get("/", (req, res) => {
 //    candidates.find().exec((err,cands)=>{
 //      if(err) {
@@ -481,6 +488,13 @@ new Vote(newVote).save().then(vote => {
 
 });
 app.post("/register", imageUploadFunc1 ,(req, res) => {
+
+  if (numCandidatesAdded >= 3) {
+    return res.status(400).send("You have reached the maximum number of candidates that can be added.");
+  }
+
+  numCandidatesAdded++;
+
 
 
   const imgg = req.files.candimg[0].path;
