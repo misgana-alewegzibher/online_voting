@@ -15,7 +15,7 @@ const ejs = require("ejs");
 const multer = require('multer');
 const tf = require("@tensorflow/tfjs");
 const tfnode = require("@tensorflow/tfjs-node");
-
+const cookieParser = require('cookie-parser');
 const app = express();
 
 
@@ -40,6 +40,9 @@ app.use(
     extended: true,
   })
 );
+
+
+  
 
 app.set("view engine", "ejs");
 
@@ -228,8 +231,8 @@ app.get("/profile", (req, res) => {
 
   candidates.find().then(candid => {
 
-    console.log("Candidates:", candid);
-    res.render('voting' , {
+
+    res.render('voting.ejs' , {
       candid: candid ,
     })
     
@@ -237,15 +240,23 @@ app.get("/profile", (req, res) => {
     console.error(err);
     res.status(500).send({message:err.message });
   });
+  
 });
      
 
 
 
 app.get("/vote", (req, res) => {
+
+
   Vote.find().then(votes => {
-    console.log("Votes:", votes);
+    
+
     res.json({success:true , votes:votes});
+
+    console.log("Votes:", votes);
+    
+console.log("hhhhhhhhhhhhhhhhh");
   }).catch(err => {
     console.error(err);
     res.status(500).send({message:err.message });
@@ -253,17 +264,7 @@ app.get("/vote", (req, res) => {
 });
 
 
-//  app.get("/", (req, res) => {
-//    candidates.find().exec((err,cands)=>{
-//      if(err) {
-//        res.json({message:err.message});
-//      }
-//      else {
-   
-//      } 
-//    })
-//  }); 
-    
+
    
  app.post('/sign_up', imageUploadFunc, (req, res) => {
   
@@ -296,6 +297,116 @@ app.get("/vote", (req, res) => {
  
 
  });
+
+
+
+
+app.post("/login", async (req, res) => {
+  const role = req.body.role;
+
+
+  try {
+
+    // Check if the user exists
+    const user = await users.findOne({ email: req.body.email });
+    if (!user) return res.status(400).send("Invalid email or password");
+
+    // Check if the password is correct
+    if (user.password !== req.body.password)
+      return res.status(400).send("Invalid full name or password");
+
+    // If the user exists and the password is correct, send the full name to the client-side script
+    if (user.role === "admin") {
+      res.sendFile(__dirname + "/views/bootstrap/admin.html");
+    } else if (user.role === "user") {
+   
+      res.sendFile(__dirname + "/views/bootstrap/facial_login.html");
+
+       
+    }
+
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while processing your request");
+  }
+});
+
+
+app.post("/vote", (req, res) => {
+  const userId=req.body.userId;
+
+      
+  const user =  users.findById(userId);
+
+  if (user.hasVoted) {
+    return res.status(400).json({ message: "You have already voted" });
+  }
+  else if (!user.hasVoted) {
+
+
+const newVote = {
+  candidates:req.body.candidates,
+  points:1
+}
+
+new Vote(newVote).save().then(vote => {
+  
+  pusher.trigger("os-poll", "os-vote", {
+    
+    points: parseInt(vote.points),
+    candidates: vote.candidates,
+  });
+
+  return res.json({
+    success: true,
+    message: "you have casted your vote successfuly",
+  });
+   
+
+});
+  }
+
+
+
+});
+
+
+
+app.post("/register", imageUploadFunc1 ,(req, res) => {
+
+  if (numCandidatesAdded >= 3) {
+    return res.status(400).send("You have reached the maximum number of candidates that can be added.");
+  }
+
+  numCandidatesAdded++;
+
+
+
+  const imgg = req.files.candimg[0].path;
+
+  const newcandidate = new candidates({
+      
+    full_name: req.body.candname1,
+    email: req.body.candemail1,   
+    description: req.body.message1,
+ candImg1  : path.join(".." + "/" + imgg),
+  });
+
+  newcandidate.save() 
+    .then(() => {
+      console.log('Data saved successfully!');
+      res.sendFile(__dirname + '/views/bootstrap/admin.html');
+    })
+    .catch((err) => {
+      console.error('Error while saving data:', err);
+      res.status(500).send('Internal Server Error');
+   });
+
+  
+  });
+
+app.listen(process.env.PORT || 3000, () => console.log("running on port 3000"));
 
 
 
@@ -432,92 +543,14 @@ app.get("/vote", (req, res) => {
 // });
 
 
-
-app.post("/login", async (req, res) => {
-  const role = req.body.role;
-
-
-  try {
-
-    // Check if the user exists
-    const user = await users.findOne({ email: req.body.email });
-    if (!user) return res.status(400).send("Invalid email or password");
-
-    // Check if the password is correct
-    if (user.password !== req.body.password)
-      return res.status(400).send("Invalid full name or password");
-
-    // If the user exists and the password is correct, send the full name to the client-side script
-    if (user.role === "admin") {
-      res.sendFile(__dirname + "/views/bootstrap/admin.html");
-    } else if (user.role === "user") {
+//  app.get("/", (req, res) => {
+//    candidates.find().exec((err,cands)=>{
+//      if(err) {
+//        res.json({message:err.message});
+//      }
+//      else {
    
-      res.sendFile(__dirname + "/views/bootstrap/facial_login.html");
-
-       
-    }
-
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("An error occurred while processing your request");
-  }
-});
-
-
-app.post("/vote", (req, res) => {
-
-const newVote = {
-  candidates:req.body.candidates,
-  points:1
-}
-
-new Vote(newVote).save().then(vote => {
-  pusher.trigger("os-poll", "os-vote", {
-    points: parseInt(vote.points),
-    candidates: vote.candidates,
-  });
-
-  return res.json({
-    success: true,
-    message: "you have casted your vote successfuly",
-  });
-   
-});
-
-
-});
-app.post("/register", imageUploadFunc1 ,(req, res) => {
-
-  if (numCandidatesAdded >= 3) {
-    return res.status(400).send("You have reached the maximum number of candidates that can be added.");
-  }
-
-  numCandidatesAdded++;
-
-
-
-  const imgg = req.files.candimg[0].path;
-
-  const newcandidate = new candidates({
-      
-    full_name: req.body.candname1,
-    email: req.body.candemail1,   
-    description: req.body.message1,
- candImg1  : path.join(".." + "/" + imgg),
-  });
-
-  newcandidate.save() 
-    .then(() => {
-      console.log('Data saved successfully!');
-      res.sendFile(__dirname + '/views/bootstrap/admin.html');
-    })
-    .catch((err) => {
-      console.error('Error while saving data:', err);
-      res.status(500).send('Internal Server Error');
-   });
-
-  
-  });
-
-app.listen(process.env.PORT || 3000, () => console.log("running on port 3000"));
+//      } 
+//    })
+//  }); 
+    
