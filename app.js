@@ -16,6 +16,8 @@ const multer = require('multer');
 const tf = require("@tensorflow/tfjs");
 const tfnode = require("@tensorflow/tfjs-node");
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 const app = express();
 
 
@@ -40,21 +42,28 @@ app.use(
     extended: true,
   })
 );
+app.use(session({
+  secret: 'my-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  store: new MongoStore({url: 'mongodb://localhost:27017/VoteDb'})
+}));
+
+app.use(cookieParser());
 
 
-  
 
 app.set("view engine", "ejs");
 
-let numCandidatesAdded = 0; 
+let numCandidatesAdded = 0;
 
 const storage = multer.diskStorage({
 
-  
+
   destination: (req, file, cb) => {
 
     const desname = req.body.full_name ;
-    
+
     const userUploadsDir = path.join(__dirname, 'uploads', desname);
     fs.mkdirSync(userUploadsDir, { recursive: true });
     if (file.fieldname === "File1") {
@@ -70,13 +79,13 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
 
     const originalExtension = file.originalname.split('.').pop();
-  
+
     // Generate the new filename by adding "1" and the original extension
 
- 
+
     if (file.fieldname === "File1") {
       cb(null, "1." + originalExtension);
-      
+
     }
     if (file.fieldname === "File2") {
       cb(null,  "2." + originalExtension);
@@ -110,7 +119,7 @@ const imageUploadFunc = imageUpload.fields([
 
 const storage1 = multer.diskStorage({
 
-  
+
   destination: (req, file, cb) => {
 
     const desnamee = req.body.candname1 ;
@@ -118,19 +127,19 @@ const storage1 = multer.diskStorage({
     fs.mkdirSync(userUploadsDirr, { recursive: true });
     if (file.fieldname === "candimg") {
       cb(null, `uploads/${desnamee}/`);
-    } 
+    }
 
   },
   filename: (req, file, cb) => {
 
     const originalExtension = file.originalname.split('.').pop();
-  
+
     // Generate the new filename by adding "1" and the original extension
 
- 
+
     if (file.fieldname === "candimg") {
       cb(null, "1." + originalExtension);
-      
+
     }
 
   },
@@ -166,32 +175,41 @@ app.use(cors());
 // const nameschema = new mongoose.Schema({
 //   full_name: String,
 //   email: String,
-//   phone_num: Number, 
+//   phone_num: Number,
 //   password: String,
 //   role: String,
 // });
 
 const nameschema = new mongoose.Schema({
   full_name: String ,
-  email: String ,
-  phone_num: Number ,
+  email: {
+    type: String,
+    unique: true
+  },
+  phone_num: {
+    type: Number,
+    unique: true
+   },
   role:  String ,
   password: String ,
   userImg1: String,
   userImg2: String,
   userImg3: String,
-  hasVoted: {
-    type: Boolean,
-    default: false
-  }
- 
+
+
 });
 const candidatesschema = new mongoose.Schema({
-  full_name: String ,
-  email: String ,
+  full_name: {
+    type: String,
+    unique: true
+  },
+  email: {
+    type: String,
+    unique: true
+  },
   description: String ,
   candImg1: String,
- 
+
 });
 
 
@@ -199,7 +217,7 @@ const VoteSchema = new mongoose.Schema({
   candidates: {
     type: String,
     required: true,
-  }, 
+  },
   points: {
     type: String,
     required: true,
@@ -215,19 +233,47 @@ const candidates = mongoose.model("candidates", candidatesschema);
 
 
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/views/bootstrap/profile.html");
+  res.sendFile(__dirname + "/views/bootstrap/landing.html");
+
 });
+
+
+
+
+app.get("/redirect2", (req, res) => {
+  users.find().then(logusrs => {
+
+    candidates.find().then(candid => {
  
+      Vote.find().then(votes => {
+
+        res.render('./bootstrap/admin.ejs', {
+          logusrs: logusrs,
+          candid: candid,
+          votes: votes
+        });
+      }).catch(err => {
+        console.error(err);
+        res.status(500).send({message: err.message});
+      });
+    }).catch(err => {
+      console.error(err);
+      res.status(500).send({message: err.message});
+    });
+  }).catch(err => {
+    console.error(err);
+    res.status(500).send({message: err.message});
+  });
+});
+
+
   
 
 
-
-
-
-
- 
 app.get("/profile", (req, res) => {
- 
+
+
+
 
   candidates.find().then(candid => {
 
@@ -235,14 +281,53 @@ app.get("/profile", (req, res) => {
     res.render('voting.ejs' , {
       candid: candid ,
     })
-    
+
   }).catch(err => {
     console.error(err);
     res.status(500).send({message:err.message });
   });
-  
+
 });
-     
+
+
+
+
+  // candidates.find().then(candid => {
+
+
+  //   // res.render('voting.ejs' , {
+  //   //   candid: candid ,
+  //   // })
+  //   res.render('./bootstrap/profile.ejs' ,   {usri: usri });
+
+  // }).catch(err => {
+  //   console.error(err);
+  //   res.status(500).send({message:err.message });
+  // });
+  app.get('/redirect', (req, res) => {
+
+    const userId = req.session.userId;
+    users.findById(userId)
+      .exec()
+      .then(user => {
+        if (!user) {
+          return res.status(404).send({message: "User not found"});
+        }
+        res.render('./bootstrap/profile.ejs', {user: user});
+      })
+      .catch(err => {
+        console.error(err);
+        res.status(500).send({message: err.message});
+      });
+
+
+  });
+
+
+
+
+
+
 
 
 
@@ -250,12 +335,12 @@ app.get("/vote", (req, res) => {
 
 
   Vote.find().then(votes => {
-    
+
 
     res.json({success:true , votes:votes});
 
     console.log("Votes:", votes);
-    
+
 console.log("hhhhhhhhhhhhhhhhh");
   }).catch(err => {
     console.error(err);
@@ -264,28 +349,26 @@ console.log("hhhhhhhhhhhhhhhhh");
 });
 
 
-
-   
  app.post('/sign_up', imageUploadFunc, (req, res) => {
-  
+
 
   const img_1 = req.files.File1[0].path;
   const img_2 = req.files.File2[0].path;
   const img_3 = req.files.File3[0].path;
- 
+
        const newUser = new users({
-      
+
          full_name: req.body.full_name,
-         email: req.body.email,   
+         email: req.body.email,
          phone_num: req.body.phone_num,
          password: req.body.password,
          role: req.body.role,
          userImg1: path.join(".." + "/" + img_1),
-         userImg2: path.join(".." + "/"+ img_2),      
+         userImg2: path.join(".." + "/"+ img_2),
                 userImg3: path.join(".." + "/" + img_3),
        });
 
-       newUser.save() 
+       newUser.save()
          .then(() => {
            console.log('Data saved successfully!');
            res.sendFile(__dirname + '/views/bootstrap/login.html');
@@ -293,8 +376,11 @@ console.log("hhhhhhhhhhhhhhhhh");
          .catch((err) => {
            console.error('Error while saving data:', err);
            res.status(500).send('Internal Server Error');
+           res.status(500).send('Internal Server Error');
+           res.status(500).send('Internal Server Error');
+
         });
- 
+
 
  });
 
@@ -303,7 +389,8 @@ console.log("hhhhhhhhhhhhhhhhh");
 
 app.post("/login", async (req, res) => {
   const role = req.body.role;
-
+  const email = req.body.email;
+  const password = req.body.password;
 
   try {
 
@@ -317,13 +404,17 @@ app.post("/login", async (req, res) => {
 
     // If the user exists and the password is correct, send the full name to the client-side script
     if (user.role === "admin") {
-      res.sendFile(__dirname + "/views/bootstrap/admin.html");
+
+      res.sendFile(__dirname + "/views/bootstrap/redirect2.html");
     } else if (user.role === "user") {
-   
+
+      req.session.userId = user._id;
+
       res.sendFile(__dirname + "/views/bootstrap/facial_login.html");
 
-       
+
     }
+
 
 
   } catch (err) {
@@ -332,18 +423,18 @@ app.post("/login", async (req, res) => {
   }
 });
 
+const COOKIE_NAME = "hasVoted";
 
 app.post("/vote", (req, res) => {
-  const userId=req.body.userId;
 
-      
-  const user =  users.findById(userId);
+  const hasVoted = req.cookies[COOKIE_NAME];
 
-  if (user.hasVoted) {
-    return res.status(400).json({ message: "You have already voted" });
+  if (hasVoted) {
+    return res.status(403).json({
+      success: false,
+      message: "You have already voted.",
+    });
   }
-  else if (!user.hasVoted) {
-
 
 const newVote = {
   candidates:req.body.candidates,
@@ -351,9 +442,9 @@ const newVote = {
 }
 
 new Vote(newVote).save().then(vote => {
-  
+
   pusher.trigger("os-poll", "os-vote", {
-    
+
     points: parseInt(vote.points),
     candidates: vote.candidates,
   });
@@ -362,10 +453,10 @@ new Vote(newVote).save().then(vote => {
     success: true,
     message: "you have casted your vote successfuly",
   });
-   
+
 
 });
-  }
+
 
 
 
@@ -386,14 +477,14 @@ app.post("/register", imageUploadFunc1 ,(req, res) => {
   const imgg = req.files.candimg[0].path;
 
   const newcandidate = new candidates({
-      
+
     full_name: req.body.candname1,
-    email: req.body.candemail1,   
+    email: req.body.candemail1,
     description: req.body.message1,
  candImg1  : path.join(".." + "/" + imgg),
   });
 
-  newcandidate.save() 
+  newcandidate.save()
     .then(() => {
       console.log('Data saved successfully!');
       res.sendFile(__dirname + '/views/bootstrap/admin.html');
@@ -403,7 +494,7 @@ app.post("/register", imageUploadFunc1 ,(req, res) => {
       res.status(500).send('Internal Server Error');
    });
 
-  
+
   });
 
 app.listen(process.env.PORT || 3000, () => console.log("running on port 3000"));
@@ -427,10 +518,10 @@ app.listen(process.env.PORT || 3000, () => console.log("running on port 3000"));
 //              phone_num: req.body.phone_num,
 //              password: req.body.password,
 //              role: req.body.role,
-          
+
 //            });
-    
-//           newUser.save() 
+
+//           newUser.save()
 //             .then(() => {
 //               console.log('Data saved successfully!');
 //               res.sendFile(__dirname + '/views/bootstrap/login.html');
@@ -491,7 +582,7 @@ app.listen(process.env.PORT || 3000, () => console.log("running on port 3000"));
 // app.post("/sign_up", async (req, res) => {
 
 
- 
+
 
 //   const newUser = new users({
 //     full_name: req.body.full_name,
@@ -500,7 +591,7 @@ app.listen(process.env.PORT || 3000, () => console.log("running on port 3000"));
 //     password: req.body.password,
 //     role: req.body.role,
 //   });
- 
+
 //   newUser
 //     .save()
 //     .then(() => {
@@ -534,7 +625,7 @@ app.listen(process.env.PORT || 3000, () => console.log("running on port 3000"));
 //       };
 
 //       res.sendFile(__dirname + "/views/bootstrap/facial_login.html");
-      
+
 //     }
 //   } catch (err) {
 //     console.error(err);
@@ -549,8 +640,7 @@ app.listen(process.env.PORT || 3000, () => console.log("running on port 3000"));
 //        res.json({message:err.message});
 //      }
 //      else {
-   
-//      } 
+
+//      }
 //    })
-//  }); 
-    
+//  });

@@ -1,25 +1,3 @@
-const formmm = document.getElementById("vote-formm");
-
-// form event listner  start
-
-formmm.addEventListener("submit", (e) => {
-  const choice = document.querySelector("input[name=candidates]:checked").value;
-
-  const data = { candidates: choice };
-
-  fetch("http://localhost:3000/vote", {
-    method: "post", 
-    body: JSON.stringify(data),
-    headers: new Headers({
-      "Content-Type": "application/json",
-    }),
-  })
-    .then((res) => res.json())
-    .then((data) => console.log(data))
-    .catch((err) => console.log(err));
-   
-  e.preventDefault();
-});                                             
 
 fetch("http://localhost:3000/vote").then(res => res.json()).then(data=>{
 
@@ -79,7 +57,7 @@ if (chartContainer) {
       } else {
         return x;
       }
-    }); 
+    });
     chart.render();
   });
 }

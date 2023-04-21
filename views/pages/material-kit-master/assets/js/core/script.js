@@ -73,7 +73,8 @@ async function recognizeFaces() {
         //   window.location.href = "./views/bootstrap/voting.html";
         // }
          if (result.label === full_name && accuracy > 0.5) {
-           window.location.href = "./views/bootstrap/profile.html";
+           window.location.href = "./views/bootstrap/redirect.html";
+             
          }
       })
 
