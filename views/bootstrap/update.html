@@ -935,36 +935,17 @@
                     </div>
                   </div>
 
-                  <div class="m-4 px-3">
+                  <div class="mb-4">
                     <div class="input-group input-group-dynamic">
-                      <label class="form-label ">Role</label>
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="role" id="userRole" value="user" checked>
-                        <label class="form-check-label" for="userRole">
-                          User
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="role" id="adminRole" value="admin">
-                        <label class="form-check-label" for="adminRole">
-                          Admin
-                        </label>
-                      </div>
+                      <label class="form-label">Role</label>
+                      <input type="text" class="form-control" name="role" pattern="^(user|admin)$" required/>
                     </div>
                   </div>
-                  
                   <div class="mb-4">
                     <div class="input-group input-group-dynamic">
                       <label class="form-label">Password</label>
                       <input type="password" class="form-control"name="password" minlength="10" required />
                     </div>
-                  </div>
-
-                  <div class="mb-4">
-                    <div class="input-group input-group-dynamic">
-                      <label class="form-label">identification number</label>
-                      <input type="text" class="form-control"name="id_number" required />
-                    </div> 
                   </div>
 
 

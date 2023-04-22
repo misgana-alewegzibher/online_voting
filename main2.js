@@ -28,10 +28,13 @@ const chartContainer = document.querySelector("#chartContainer");
 if (chartContainer) {
   const chart = new CanvasJS.Chart("chartContainer", {
     animationEnabled: true,
+    animationDuration: 2000,
+    animationEasing: "easeOutQuart",
     theme: "theme3",
     title: {
-      text: `total votes ${totalVotes}`,
+      text: `Total votes = ${totalVotes}`,
     },
+    
     data: [
       {
         type: "pie",

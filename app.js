@@ -223,12 +223,22 @@ const VoteSchema = new mongoose.Schema({
     required: true,
   },
 });
+const IdSchema = new mongoose.Schema({
+  full_name: {
+    type: String,
+    required: true,
+  },
+  idnum: {
+    type: String,
+    required: true,
+  },
+});
 
 const users = new mongoose.model("users", nameschema);
 const admins = new mongoose.model("admins", nameschema);
 const Vote = mongoose.model("Vote", VoteSchema);
 const candidates = mongoose.model("candidates", candidatesschema);
-
+const IdNumber = mongoose.model("IdNumber", IdSchema);
 
 
 
@@ -318,7 +328,7 @@ app.get("/profile", (req, res) => {
       .catch(err => {
         console.error(err);
         res.status(500).send({message: err.message});
-      });
+      });  
 
 
   });
@@ -335,7 +345,7 @@ app.get("/vote", (req, res) => {
 
 
   Vote.find().then(votes => {
-
+  
 
     res.json({success:true , votes:votes});
 
@@ -349,43 +359,49 @@ console.log("hhhhhhhhhhhhhhhhh");
 });
 
 
- app.post('/sign_up', imageUploadFunc, (req, res) => {
-
-
+app.post('/sign_up', imageUploadFunc, (req, res) => {
   const img_1 = req.files.File1[0].path;
   const img_2 = req.files.File2[0].path;
   const img_3 = req.files.File3[0].path;
+  const id_number =  req.body.id_number;
+  
+  const newUser = new users({
+    full_name: req.body.full_name,
+    email: req.body.email,
+    phone_num: req.body.phone_num,
+    password: req.body.password,
+    role: req.body.role,
+    userImg1: path.join(".." + "/" + img_1),
+    userImg2: path.join(".." + "/"+ img_2),
+    userImg3: path.join(".." + "/" + img_3),
+  });
 
-       const newUser = new users({
-
-         full_name: req.body.full_name,
-         email: req.body.email,
-         phone_num: req.body.phone_num,
-         password: req.body.password,
-         role: req.body.role,
-         userImg1: path.join(".." + "/" + img_1),
-         userImg2: path.join(".." + "/"+ img_2),
-                userImg3: path.join(".." + "/" + img_3),
-       });
-
-       newUser.save()
-         .then(() => {
-           console.log('Data saved successfully!');
-           res.sendFile(__dirname + '/views/bootstrap/login.html');
-         })
-         .catch((err) => {
-           console.error('Error while saving data:', err);
-           res.status(500).send('Internal Server Error');
-           res.status(500).send('Internal Server Error');
-           res.status(500).send('Internal Server Error');
-
+  // Check if the entered ID number exists in the database
+  IdNumber.findOne({ id_number: req.body.id_number }).exec()
+  .then((idnumber) => {
+    console.log(idnumber);
+    if (!idnumber) {
+      console.error('ID number not found');
+      res.status(400).send('Invalid ID number');
+    } else {
+      // ID number found, save the user to the database
+      newUser.save()
+        .then(() => {
+          console.log('Data saved successfully!');
+          res.sendFile(__dirname + '/views/bootstrap/login.html');
+        })
+        .catch((err) => {
+          console.error('Error while saving data:', err);
+          res.status(500).send('Internal Server Error');
         });
+    }
+  })
+  .catch((err) => {
+    console.error('Error while searching for ID number:', err);
+    res.status(500).send('Internal Server Error');
+  });
 
-
- });
-
-
-
+});
 
 app.post("/login", async (req, res) => {
   const role = req.body.role;
@@ -410,12 +426,12 @@ app.post("/login", async (req, res) => {
 
       req.session.userId = user._id;
 
-      res.sendFile(__dirname + "/views/bootstrap/facial_login.html");
+      res.sendFile(__dirname + "/views/bootstrap/facial_login.html"); 
 
 
     }
 
-
+ 
 
   } catch (err) {
     console.error(err);
