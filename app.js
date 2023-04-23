@@ -239,6 +239,8 @@ const admins = new mongoose.model("admins", nameschema);
 const Vote = mongoose.model("Vote", VoteSchema);
 const candidates = mongoose.model("candidates", candidatesschema);
 const IdNumber = mongoose.model("IdNumber", IdSchema);
+const IdNumberad = mongoose.model("IdNumberad", IdSchema);
+
 
 
 
@@ -376,6 +378,7 @@ app.post('/sign_up', imageUploadFunc, (req, res) => {
     userImg3: path.join(".." + "/" + img_3),
   });
 
+  if (req.body.role === 'user') {
   // Check if the entered ID number exists in the database
   IdNumber.findOne({ id_number: req.body.id_number }).exec()
   .then((idnumber) => {
@@ -393,14 +396,41 @@ app.post('/sign_up', imageUploadFunc, (req, res) => {
         .catch((err) => {
           console.error('Error while saving data:', err);
           res.status(500).send('Internal Server Error');
-        });
+        }); 
     }
   })
   .catch((err) => {
     console.error('Error while searching for ID number:', err);
     res.status(500).send('Internal Server Error');
   });
-
+  }
+  else if (req.body.role === 'admin') {
+    // ID number found, save the user to the database
+    IdNumberad.findOne({ id_number: req.body.id_number }).exec()
+    
+    .then((idnumber) => {
+      console.log(idnumber);
+      if (!idnumber) {
+        console.error('ID number not found');
+        res.status(400).send('Invalid credentials');
+      } else {
+        // ID number found, save the user to the database
+        newUser.save()
+          .then(() => {
+            console.log('Data saved successfully!');
+            res.sendFile(__dirname + '/views/bootstrap/login.html');
+          })
+          .catch((err) => {
+            console.error('Error while saving data:', err);
+            res.status(500).send('Internal Server Error');
+          }); 
+      }
+    })
+    .catch((err) => {
+      console.error('Error while searching for ID number:', err);
+      res.status(500).send('Internal Server Error');
+    });
+  }
 });
 
 app.post("/login", async (req, res) => {
