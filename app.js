@@ -188,7 +188,7 @@ const nameschema = new mongoose.Schema({
   },
   phone_num: {
     type: Number,
-    unique: true
+    
    },
   role:  String ,
   password: String ,
