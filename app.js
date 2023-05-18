@@ -28,7 +28,7 @@ app.use(express.static(__dirname));
 
 app.use(bodyParser.json());
 mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://localhost:27017/VoteDb", {
+mongoose.connect("mongodb+srv://misgana1234:FtDhW0JIAoXZhjJM@cluster0.kj7vfz8.mongodb.net/?retryWrites=true&w=majority", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 
@@ -46,7 +46,7 @@ app.use(session({
   secret: 'my-secret-key', 
   resave: false,
   saveUninitialized: false,
-  store: new MongoStore({url: 'mongodb://localhost:27017/VoteDb'})
+  store: new MongoStore({url: 'mongodb+srv://misgana1234:FtDhW0JIAoXZhjJM@cluster0.kj7vfz8.mongodb.net/?retryWrites=true&w=majority'})
 }));
 
 app.use(cookieParser());
@@ -351,7 +351,7 @@ app.get("/vote", (req, res) => {
 
     res.json({success:true , votes:votes});
 
-
+    console.log("Votes:", votes);
 
 console.log("hhhhhhhhhhhhhhhhh");
   }).catch(err => {
